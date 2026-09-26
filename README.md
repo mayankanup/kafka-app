@@ -110,6 +110,8 @@ $env:APP_ORDER_MAX_ORDERS="5"; $env:APP_ORDER_MIN_DELAY_MS="1000"; $env:APP_ORDE
 | Producer: broker `NOT_AVAILABLE` / connection refused | Kafka not up — `docker compose up -d`, wait ~30s, rerun producer |
 | Consumer idles, no `Processing` lines | Producer hasn't published yet, or consumer group already consumed everything (offsets committed) — rerun producer for new orders |
 | CSV stays header-only | Consumer still "working" (20–60s per order is normal) — watch its log |
+| Queue number frozen while offsets/CSV still advance | Normal with big poll batches: the number = broker end − prefetched position, so it only drops when the next poll happens. We set `max.poll.records=1`, so it ticks down per order |
+| `consumer poll timeout has expired`, group leave/rejoin churn | Processing slower than `max.poll.interval.ms` (5 min) across a batch — `max.poll.records=1` in the consumer config fixes it; don't raise batch size |
 | Port `29092` already in use | Old Kafka still running — `docker compose down` first |
 | Windows CSV path fails | Use forward slashes: `C:/temp/OrderDetails.csv` |
 

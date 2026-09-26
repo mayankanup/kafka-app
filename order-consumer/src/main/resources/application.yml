@@ -9,6 +9,10 @@ spring:
       properties:
         spring.json.trusted.packages: "com.example.orders.*"
         spring.json.value.default.type: com.example.orders.common.Order
+        # One record per poll: with 20-60s simulated work per order, a bigger
+        # batch would exceed max.poll.interval.ms (5 min) and kick us out of
+        # the group. Bonus: the queue-backlog log line ticks down per order.
+        max.poll.records: 1
 
 app:
   order:
