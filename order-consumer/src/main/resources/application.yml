@@ -1,0 +1,26 @@
+spring:
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+    consumer:
+      group-id: ${SPRING_KAFKA_CONSUMER_GROUP_ID:order-processor}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.example.orders.*"
+        spring.json.value.default.type: com.example.orders.common.Order
+
+app:
+  order:
+    topic: ${APP_ORDER_TOPIC:orders}
+    # Windows default per spec. Override with env APP_ORDER_CSV_PATH when needed.
+    csv-path: ${APP_ORDER_CSV_PATH:C:/temp/OrderDetails.csv}
+    # Simulated work per order: sleep a random min..max delay before writing the CSV row.
+    processing:
+      min-delay-ms: ${APP_ORDER_PROCESSING_MIN_DELAY_MS:20000}
+      max-delay-ms: ${APP_ORDER_PROCESSING_MAX_DELAY_MS:60000}
+
+logging:
+  level:
+    com.example.orders: INFO
+    org.springframework.kafka: WARN

@@ -1,0 +1,19 @@
+spring:
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+app:
+  order:
+    topic: ${APP_ORDER_TOPIC:orders}
+    # CLI run: publish up to max-orders, sleeping a random min-delay-ms..max-delay-ms between orders.
+    max-orders: ${APP_ORDER_MAX_ORDERS:100}
+    min-delay-ms: ${APP_ORDER_MIN_DELAY_MS:1000}
+    max-delay-ms: ${APP_ORDER_MAX_DELAY_MS:30000}
+
+logging:
+  level:
+    com.example.orders: INFO
+    org.springframework.kafka: WARN
