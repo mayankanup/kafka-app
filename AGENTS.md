@@ -1,6 +1,6 @@
 # AGENTS.md — kafka-app
 
-Maven multi-module, Spring Boot 3.5 (Java 17). Two CLI processes share `order-common` via Kafka topic `orders`. Docker runs Kafka ONLY — never containerize the apps.
+Maven multi-module, Spring Boot 3.5 (Java 17). Two CLI processes share `order-common` via Kafka topic `orders`. Docker holds Kafka + Kafka UI only — never containerize the apps.
 
 ## Modules
 - `order-common/` — plain jar, `Order` POJO only (no Spring).
@@ -8,7 +8,7 @@ Maven multi-module, Spring Boot 3.5 (Java 17). Two CLI processes share `order-co
 - `order-consumer/` — CLI worker (non-web: `starter` + `starter-json` + `spring-kafka`; the `-json` starter is REQUIRED for `JsonDeserializer` — verified crash without it). `ConsumerApplication`, `consumer/OrderConsumer` (`ConsumerRecord` + `Consumer` params; logs partition/offset + `endOffsets-position` backlog; random work sleep; then CSV), `service/CsvOrderWriter` (single `@Autowired` String ctor + test-only `Path` ctor; synchronized; creates dirs + header).
 
 ## Commands (root `C:\anup\code\java\kafka-app` unless noted)
-- Kafka: `docker compose up -d` (host broker `localhost:29092`); `down` / `down -v` to stop/wipe
+- Kafka: `docker compose up -d` (host broker `localhost:29092`, web UI `:8081`); `down` / `down -v` to stop/wipe
 - Build: `mvn -q clean install -DskipTests` (needed once so modules resolve `order-common`)
 - Host run, two terminals: T1 `cd order-consumer; mvn spring-boot:run`, T2 `cd order-producer; mvn spring-boot:run`
 - All tests: `mvn -q clean test`. Single test: `mvn -q -pl order-consumer -Dtest=CsvOrderWriterTest test`

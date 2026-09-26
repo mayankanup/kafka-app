@@ -1,7 +1,8 @@
 # Kafka for local dev (KRaft, no ZooKeeper). The producer and consumer
-# are plain CLI processes on the host — only Kafka runs in Docker.
+# are plain CLI processes on the host — Docker holds Kafka + its web UI.
 #
 #   Host apps -> broker localhost:29092
+#   Web UI    -> http://localhost:8081
 services:
   kafka:
     image: apache/kafka:4.0.0
@@ -22,6 +23,17 @@ services:
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
     volumes:
       - kafka-data:/var/lib/kafka/data
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:v0.7.2
+    container_name: kafka-ui
+    depends_on:
+      - kafka
+    ports:
+      - "8081:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
 
 volumes:
   kafka-data:

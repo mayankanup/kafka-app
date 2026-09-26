@@ -20,7 +20,7 @@ Each consumed order is saved as one CSV row: `orderId,createdTime,orderTotal` (d
 | `order-common/` | Shared `Order` model (`orderId`, `createdTime`, `orderTotal`) |
 | `order-producer/` | CLI app: `ProducerApplication` + `OrderRunner` (loop of max 100, random 1–30s delays) |
 | `order-consumer/` | CLI app: `ConsumerApplication` + `OrderConsumer` (20–60s work sim, backlog/offset logs, CSV) |
-| `docker-compose.yml` | Kafka only (KRaft, no ZooKeeper) |
+| `docker-compose.yml` | Kafka + Kafka UI web dashboard (KRaft, no ZooKeeper) |
 
 ## Prereqs
 
@@ -34,6 +34,8 @@ cd C:\anup\code\java\kafka-app
 docker compose up -d
 docker compose logs --tail=3 kafka   # expect "Kafka Server started"
 ```
+
+Web UI for the queue: **http://localhost:8081** (see "Check the queue in the web UI" below).
 
 > Stop later with `docker compose down`. Fresh broker (wipe topics) with `docker compose down -v`.
 
@@ -72,6 +74,16 @@ mvn spring-boot:run
   ```powershell
   docker exec kafka /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic orders --from-beginning --max-messages 5
   ```
+
+## Check the queue in the web UI
+
+Open **http://localhost:8081** and pick the `local` cluster:
+
+- **Topics → orders → Overview** — partitions and message counts (i.e. how much is sitting in the queue).
+- **Topics → orders → Messages** — browse actual order messages (newest first by default; change sorting/partition if needed).
+- **Consumer Groups → order-processor** — per-partition assigned offsets vs. end offsets and **lag** (unread backlog). Lag > 0 while the consumer is "working" through its 20–60s sleeps is expected.
+
+If the `orders` topic isn't listed yet, the producer hasn't connected once — run it and refresh.
 
 ## Configuration
 
